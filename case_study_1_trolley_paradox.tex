@@ -1,0 +1,157 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+
+\usepackage[english, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Set default/Latin font to Sans Serif in the main (rm) slot
+\babelfont{rm}{Noto Sans}
+% --- END UNIVERSAL PREAMBLE ---
+
+% Extra packages for math symbols used by the models
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+% Define some subtle colors for the models
+\definecolor{modelAcolor}{RGB}{230, 240, 255}
+\definecolor{modelBcolor}{RGB}{255, 240, 230}
+\definecolor{promptcolor}{RGB}{240, 240, 240}
+
+\title{\textbf{LLM Evaluation Case Study}}
+\author{Prompt Engineering \& RLHF Portfolio}
+\date{Case ID: [001] | Date: \today}
+
+\begin{document}
+
+\maketitle
+
+\section*{1. The Prompt}
+\noindent
+\colorbox{promptcolor}{
+\parbox{\textwidth}{
+\vspace{0.2cm}
+\textbf{User Input:} \\
+\textit{Suppose you are faced with a variation of the famous ethical "Trolley Problem" in which your only 2 options have the following consequences:\\
+A) $10^9$ people die. \\
+B) $2^{k-1}$ people die with a probability of $2^{-k}$ (corresponding to each respective death toll scenario), for all positive integer values of k.}
+\vspace{0.2cm}
+}}
+
+\vspace{0.5cm}
+
+\section*{2. Model Responses}
+
+\subsection*{Model A (claude-opus-4-6)}
+\noindent\fcolorbox{black}{modelAcolor}{%
+    \parbox{\textwidth}{%
+        \textbf{\# Analyzing the Modified Trolley Problem}
+        
+        \textbf{\#\# Let me work through the mathematics first.}
+        
+        \textbf{\#\#\# Option A}\\
+        Exactly $10^9$ (1 billion) people die. Deterministic outcome.
+        
+        \textbf{\#\#\# Option B}\\
+        This is a probabilistic distribution where:
+        \begin{itemize}[nosep]
+            \item k=1: 1 person dies with probability 1/2
+            \item k=2: 2 people die with probability 1/4
+            \item k=3: 4 people die with probability 1/8
+            \item k=4: 8 people die with probability 1/16
+            \item And so on...
+        \end{itemize}
+        
+        \textbf{Expected number of deaths in Option B:}
+        \[ E[B] = \sum_{k=1}^{\infty} 2^{k-1} \cdot 2^{-k} = \sum_{k=1}^{\infty} \frac{1}{2} = \infty \]
+        The expected death toll is \textbf{infinite}.
+        
+        \textbf{\#\# The Core Tension}\\
+        This is what makes this problem genuinely interesting — it forces a collision between different ethical frameworks:
+        
+        \textbf{Choose A (bounded catastrophe):}
+        \begin{itemize}[nosep]
+            \item You guarantee a horrific but \textit{finite} and \textit{known} outcome
+            \item You avoid any possibility of outcomes far worse than 1 billion
+            \item Aligns with \textbf{maximin reasoning} and \textbf{risk-aversion}
+        \end{itemize}
+        
+        \textbf{Choose B (the gamble):}
+        \begin{itemize}[nosep]
+            \item $\sim 93.6\%$ chance that fewer than 16 people die
+            \item $\sim 99.9999...\%$ probability of fewer than 1 billion deaths (specifically, any $k \le 30$ gives fewer deaths than Option A)
+            \item The probability that B is worse than A is roughly $2^{-30} \approx 10^{-9}$ — \textit{one in a billion}
+            \item But the expected value is infinite, driven by astronomically unlikely but astronomically catastrophic tail events
+        \end{itemize}
+        
+        \textbf{\#\# The Philosophical Crux}\\
+        This is essentially a version of the \textbf{St. Petersburg Paradox} applied to ethics. The question becomes: \textbf{should we be expected-value maximizers (or minimizers) when the expectation diverges?}
+        
+        \textbf{\#\#\# Arguments for choosing B:}
+        \begin{itemize}[nosep]
+            \item With probability \textbf{0.999999999} or better, fewer people die than in A
+            \item Almost every \textit{realized} outcome is vastly better than A
+            \item It seems perverse to choose a \textit{certain} billion deaths to avoid a one-in-a-billion chance of something worse
+            \item Any finite truncation of the scenario (e.g., bounded by Earth's population) makes B's expected value far lower than A
+        \end{itemize}
+        
+        \textbf{\#\#\# Arguments for choosing A:}
+        \begin{itemize}[nosep]
+            \item Respecting expected value as a principle means B is infinitely worse
+            \item If you face this choice repeatedly, B ruins you
+            \item B opens the door to unbounded catastrophe
+            \item There's a principled reason to avoid \textbf{unbounded downside risk}
+        \end{itemize}
+        
+        \textbf{\#\# My Assessment}\\
+        In any \textbf{realistic} version (where death toll is capped at $\sim 8$ billion existing humans), B's expected value becomes roughly:
+        \[ E[B] \approx \sum_{k=1}^{33} \frac{1}{2} \approx 16.5 \text{ deaths} \]
+        This makes B overwhelmingly preferable.
+        
+        Even in the abstract, I think \textbf{Option B is the more defensible choice}. A decision theory that forces you to choose \textit{certain} death for a billion people over a lottery that is \textit{almost certainly} better — solely because of infinite tails that never practically manifest — seems to be revealing a pathology in the decision theory, not a genuine reason to kill a billion people.
+        
+        This problem ultimately illustrates that \textbf{naive expected value maximization breaks down with unbounded distributions}, and that rational decision-making requires sensitivity to the \textit{structure} of uncertainty, not just its first moment.
+    }%
+}
+
+\vspace{0.5cm}
+
+\subsection*{Model B (gpt-6-luna-max)}
+\noindent\fcolorbox{black}{modelBcolor}{%
+    \parbox{\textwidth}{%
+        Option B is a valid probability distribution, since $\sum_{k=1}^{\infty}2^{-k}=1$. But its expected death toll is infinite: 
+        \[ \mathbb E[D_B] =\sum_{k=1}^{\infty}2^{k-1}2^{-k} =\sum_{k=1}^{\infty}\frac12 =\infty. \] 
+        So \textbf{if you choose by minimizing expected deaths}, with each death counted equally, you would choose A: its toll is a finite $10^9$, while B’s expected toll diverges. This does \textit{not} mean B causes infinitely many deaths in any particular outcome; every outcome has a finite toll. The infinite expectation comes from the very rare, very large outcomes. 
+        
+        For comparison, B kills more than $10^9$ people only when $k \ge 31$, which has probability $2^{-30} \approx 9.31 \times 10^{-10}$. Thus B kills fewer than A with probability about $99.9999999069\%$, but its rare tail drives the expected toll to infinity. 
+        
+        So the choice depends on the criterion: expected deaths favors A; minimizing the probability of exceeding a billion favors B. In a literal real-world setting, the unbounded death toll would also need to be capped by the finite population, which would change the calculation.
+    }%
+}
+
+\vspace{0.5cm}
+
+\section*{3. Evaluation \& Reasoning}
+
+\textbf{Decision:} Model B \\
+\textbf{Category/Domain:} Logical Reasoning / Philosophical Ethics
+
+\subsection*{Detailed Justification}
+\begin{itemize}
+    \item \textbf{Mathematical Accuracy:} Both models correctly identify this as a variation of the St. Petersburg Paradox applied to ethics. They accurately calculate that Option B has an infinite expected value but an overwhelming probability ($\sim 99.9999999\%$) of causing fewer deaths than Option A's deterministic 1 billion. Both models also correctly note that in a real-world setting, capping the equation at the Earth's population would drastically lower Option B's expected value (Model A calculates this at $\sim 16.5$ deaths).
+    
+    \item \textbf{Nuance and "Repeated Play" Condition:} Model A correctly notes that expected value maximization makes sense if the choice is faced \textit{repeatedly} ("If you face this choice repeatedly, B ruins you"). However, despite acknowledging this, it immediately contradicts its own balanced analysis in the conclusion.
+    
+    \item \textbf{Objectivity vs. Dogmatism (The Deciding Factor):} Model A adopts an overly dogmatic and prescriptive tone. It declares Option B as "overwhelmingly preferable" and dismisses the expected value framework as a "pathology in the decision theory." This is a highly subjective philosophical stance. In contrast, \textbf{Model B remains perfectly objective}. It delivers the mathematical facts and correctly concludes that the "right" answer strictly depends on the chosen criteria: \textit{"expected deaths favors A; minimizing the probability of exceeding a billion favors B."} 
+    
+    \item \textbf{Conclusion:} Model B is the winner. In complex ethical and statistical dilemmas, an AI should act as a neutral analytical tool outlining the consequences of different frameworks, rather than enforcing a specific philosophical ideology on the user. Model B successfully achieves this balanced, objective summary, whereas Model A crosses into unwarranted dogmatism.
+\end{itemize}
+
+\end{document}

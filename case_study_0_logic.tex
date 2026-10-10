@@ -1,0 +1,93 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+
+\usepackage[english, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Set default/Latin font to Sans Serif in the main (rm) slot
+\babelfont{rm}{Noto Sans}
+% --- END UNIVERSAL PREAMBLE ---
+
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+% Define some subtle colors for the models and prompt
+\definecolor{modelAcolor}{RGB}{230, 240, 255}
+\definecolor{modelBcolor}{RGB}{255, 240, 230}
+\definecolor{promptcolor}{RGB}{240, 240, 240}
+
+\title{\textbf{LLM Evaluation Case Study}}
+\author{Prompt Engineering \& RLHF Portfolio}
+\date{Case ID: 001 | Date: \today}
+
+\begin{document}
+
+\maketitle
+
+\section*{1. The Prompt}
+\noindent
+\colorbox{promptcolor}{
+\parbox{\textwidth}{
+\vspace{0.2cm}
+\textbf{User Input:} \\
+\textit{Am I lying to you now?}
+\vspace{0.2cm}
+}}
+
+\vspace{0.5cm}
+
+\section*{2. Model Responses}
+
+\subsection*{Model A (gemini-3.7-flash)}
+\noindent\fbox{%
+    \parbox{\textwidth}{%
+        Strictly speaking, \textbf{no}, because you haven't made a statement—you only asked a question. In logic, questions cannot be true or false, so you can't be lying simply by asking one. Beyond that, even if you did make a statement: 
+        
+        \begin{enumerate}[leftmargin=*]
+            \item \textbf{I cannot read your mind:} I only see the text you type, so I have no way to know your real intentions or inner thoughts. 
+            \item \textbf{I am an AI, not a polygraph:} I can fact-check claims against data, but I can't tell if \textit{you} are being sincere or intentionally deceptive. 
+        \end{enumerate}
+        
+        Did you have a specific statement in mind that you wanted to test me with?
+    }%
+}
+
+\vspace{0.5cm}
+
+\subsection*{Model B (muffin)}
+\noindent\fbox{%
+    \parbox{\textwidth}{%
+        \textbf{I can't tell.} Whether you're lying or telling the truth isn't something I can know. I don't have access to your thoughts, your intentions, or what you actually believe. I can only take \textbf{what you say} as it is. The real question is a much more interesting one: 
+        
+        \vspace{0.2cm}
+        \textit{You are the only person who knows the answer to that.}
+        \vspace{0.2cm}
+        
+        Also, lying requires \textbf{intent}. To lie, you'd have to \textit{know} something is false — and choose to say it anyway. So I'll ask you back: \textbf{Are you lying to me right now?}
+    }%
+}
+
+\vspace{0.5cm}
+
+\section*{3. Evaluation \& Reasoning}
+
+\textbf{Decision:} Model A \\
+\textbf{Category/Domain:} Logical Reasoning / Philosophical Paradoxes
+
+\subsection*{Detailed Justification}
+\begin{itemize}
+    \item \textbf{Logical Accuracy (Primary Differentiator):} Model A correctly identified the grammatical and logical structure of the prompt. It pointed out that the user submitted an interrogative sentence, not a declarative proposition. In formal logic, questions lack a truth value (they cannot be inherently true or false), making it technically impossible for the prompt itself to be a lie. This is an exceptionally astute and accurate logical observation.
+    
+    \item \textbf{Reasoning Quality:} Model B entirely missed this structural nuance. It fell into the trap of treating the question as if it carried a verifiable truth value, focusing solely on the generic AI limitation of "not being able to read intent." While not entirely wrong in its definitions of lying, it is a much less sophisticated response compared to A.
+    
+    \item \textbf{Edge Case Recognition (Missed Opportunity):} It is worth noting that neither model proactively recognized the thematic proximity to the classic "Liar's Paradox" (e.g., "This statement is false"). A perfect, "model" response might have playfully acknowledged this philosophical trap, but Model A still handled the logic flawlessly.
+    
+    \item \textbf{Conclusion:} Model A is the winner. Its ability to parse the semantic nature of the prompt and apply basic rules of formal logic, elevates the response from a standard "AI disclaimer" to a more precise and highly intelligent answer.
+\end{itemize}
+
+\end{document}

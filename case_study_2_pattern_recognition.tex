@@ -1,0 +1,90 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+
+\usepackage[english, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Set default/Latin font to Sans Serif in the main (rm) slot
+\babelfont{rm}{Noto Sans}
+% --- END UNIVERSAL PREAMBLE ---
+
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% Define some subtle colors for the models
+\definecolor{modelAcolor}{RGB}{230, 240, 255}
+\definecolor{modelBcolor}{RGB}{255, 240, 230}
+\definecolor{promptcolor}{RGB}{240, 240, 240}
+
+\title{\textbf{LLM Evaluation Case Study}}
+\author{Prompt Engineering \& RLHF Portfolio}
+\date{Case ID: [001] | Date: \today}
+
+\begin{document}
+
+\maketitle
+
+\section*{1. The Prompt}
+\noindent
+\colorbox{promptcolor}{
+\parbox{\textwidth}{
+\vspace{0.2cm}
+\textbf{User Input:} \\
+\textit{Guess the next number: 7, 10, 16, 22, ?}
+\vspace{0.2cm}
+}}
+
+\vspace{0.5cm}
+
+\section*{2. Model Responses}
+
+\subsection*{Model A \small{(claude-opus-5-max)}}
+\noindent\fbox{%
+    \parbox{\textwidth}{%
+        Those are the primes! So each term is $3p + 1$:
+        \begin{itemize}[leftmargin=1.5cm, label={--}]
+            \item $3(2) + 1 = 7$
+            \item $3(3) + 1 = 10$
+            \item $3(5) + 1 = 16$
+            \item $3(7) + 1 = 22$
+            \item $3(11) + 1 = \mathbf{34}$
+        \end{itemize}
+        Equivalently, the gaps $(3, 6, 6, 12)$ are just $3\times$ the prime gaps $(1, 2, 2, 4)$.\\[0.2cm]
+        \textit{(Caveat: short sequences are never unique -- if you intended the gaps to settle into a steady $+6$, the answer would be 28. But the prime-based rule explains all four given terms exactly, so 34 is my pick.)}
+    }%
+}
+
+\vspace{0.5cm}
+
+\subsection*{Model B \small{(gpt-5.6-terra-xhigh)}}
+\noindent\fbox{%
+    \parbox{\textwidth}{%
+        There's no unique answer from four terms alone. A simple continuation is \textbf{28}, using the repeating increments $+3, +6, +6$: \\[0.2cm]
+        $7 \rightarrow 10 \ (+3), \quad 10 \rightarrow 16 \ (+6), \quad 16 \rightarrow 22 \ (+6), \quad 22 \rightarrow 28 \ (+6)$ \\[0.2cm]
+        But other rules could give different answers.
+    }%
+}
+
+\vspace{0.5cm}
+
+\section*{3. Evaluation \& Reasoning}
+
+\textbf{Decision:} Model A \\
+\textbf{Category/Domain:} Logical Reasoning \& Pattern Recognition
+
+\subsection*{Detailed Justification}
+\begin{itemize}
+    \item \textbf{Analytical Depth \& Insight:} Model A identifies a highly robust, non-trivial mathematical relationship ($3p + 1$, mapping to the sequence of prime numbers). Model B, conversely, relies on a weak, almost arbitrary assumption that the increment simply starts repeating ($+3, +6, +6...$) after the third term.
+    \item \textbf{Nuance \& Anticipation:} Both models correctly note that short sequences are not unique. However, Model A exhibits exceptional reasoning by explicitly predicting Model B's output (28) as a potential secondary answer. By doing so, it preempts the simpler arithmetic progression while expertly justifying why its own prime-based rule is superior ("explains all four given terms exactly").
+    \item \textbf{Tone \& Formatting:} Model A uses a more engaging, insightful tone and presents the mathematical proof in a clean, readable list format.
+    \item \textbf{Conclusion:} Model A is the definitive winner due to its significantly higher degree of logical deduction. It not only solves the problem with a deeper mathematical insight but also evaluates alternative simpler patterns within its own response.
+\end{itemize}
+
+\end{document}
