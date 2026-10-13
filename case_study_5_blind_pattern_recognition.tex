@@ -1,0 +1,134 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+
+\usepackage[english, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Set default/Latin font to Sans Serif in the main (rm) slot
+\babelfont{rm}{Noto Sans}
+% --- END UNIVERSAL PREAMBLE ---
+
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{amssymb}
+
+% Define some subtle colors for the models
+\definecolor{promptcolor}{RGB}{240, 240, 240}
+
+\title{\textbf{LLM Evaluation Case Study}}
+\author{Prompt Engineering \& RLHF Portfolio}
+\date{Case ID: [005] | Category: Logical \& Mathematical Reasoning}
+
+\begin{document}
+
+\maketitle
+
+\section*{1. The Prompt}
+\noindent
+\colorbox{promptcolor}{
+\parbox{\dimexpr\textwidth-2\fboxsep\relax}{
+\vspace{0.2cm}
+\textbf{User Input:} \\
+\textit{Find the missing term: 0, -1, -1, -1, -3, -21, -1, -58, 2, -2, 2, -4, -3, 1, -1, -147, 0, -14, 2, 0, 0, 0, 0, -1, -1, -1, -2, -7, -1, -24, -31, -2, 2, -11, -3, 1, -1, -33, 0, -5, 2, 0, 0, 0, 0, -1, -1, -1, -2, -4, -1, -15, -3, -2, 3, 0, -3, 1, 0, -19, 0, -3, 2, 0, 0, 0, 0, -1, -1, -1, -2, -3, -1, -11, -2, -2, 3, 0, -3, 1, 1, -13, 0, -2, 2, 0, 0, 0, 0, -1, 0, -1, -2, -2, -1, ?, -1, -2, 3, -13, -3}
+\vspace{0.2cm}
+
+\textbf{[Evaluator's Hidden Context]:} \textit{The sequence represents the terms for $n=0, 1, 2, \dots, 100$ of the function $a_n = \lfloor \tan(n+\tan(n)) \rfloor$.}
+\vspace{0.2cm}
+}}
+
+\vspace{0.5cm}
+
+\section*{2. Model Responses}
+
+\subsection*{Model A (ling-3.0-plus)}
+\noindent\fbox{%
+    \parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{%
+        \textbf{\#\# Finding the Pattern}\\
+        Let me index the terms and look for structure. I notice runs of four zeros appear at positions \textbf{20--23, 42--45, 64--67, 86--89} --- spaced exactly \textbf{22 apart}. This means the sequence is organized into \textbf{blocks of 18 data values separated by four-zero separators}.\\
+        
+        \textbf{Aligning the blocks:}\\
+        {\scriptsize
+        \setlength{\tabcolsep}{3pt}
+        \begin{tabular}{lcccccccccccccccccc}
+        \toprule
+        idx & 1 & 2 & 3 & 4 & 5 & 6 & \textbf{7} & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 \\
+        \midrule
+        B1 & -1 & -1 & -1 & -2 & -7 & -1 & \textbf{-24} & -31 & -2 & 2 & -11 & -3 & 1 & -1 & -33 & 0 & -5 & 2 \\
+        B2 & -1 & -1 & -1 & -2 & -4 & -1 & \textbf{-15} & -3 & -2 & 3 & 0 & -3 & 1 & 0 & -19 & 0 & -3 & 2 \\
+        B3 & -1 & -1 & -1 & -2 & -3 & -1 & \textbf{-11} & -2 & -2 & 3 & 0 & -3 & 1 & 1 & -13 & 0 & -2 & 2 \\
+        B4 & -1 & 0 & -1 & -2 & -2 & -1 & \textbf{?} & -1 & -2 & 3 & -13 & -3 & \dots & & & & & \\
+        \bottomrule
+        \end{tabular}
+        }\\
+        The missing term (position 96) is \textbf{column 7 of Block 4}.\\
+        
+        \textbf{\#\# Analyzing Column 7}\\
+        The column-7 values form a converging sequence:
+        \[ -24,\ -15,\ -11,\ ? \]
+        with successive differences \textbf{+9, +4, \dots}\\
+        
+        \textbf{Checking convergence (geometric model):}\\
+        Assume $a_n = L + (a_0-L)r^n$:
+        \begin{itemize}[leftmargin=*, topsep=0pt, itemsep=0pt]
+            \item Fitting gives $L \approx -8$, with deviations $16, 7, 3, \dots$ (roughly halving)
+            \item Next deviation $\approx$ \textbf{1}, giving $a_3 = -8 - 1 = -9$
+        \end{itemize}
+        
+        \textbf{Cross-checking with column 15} (the parallel spike column: $-33, -19, -13$):
+        \begin{itemize}[leftmargin=*, topsep=0pt, itemsep=0pt]
+            \item The gap between columns 15 and 7 magnitudes: $9, 4, 2, \dots$ (halving $\rightarrow$ next is \textbf{1})
+            \item Column 15 next value $\approx -10$, so column 7 = $-10 + 1 = -9$ (\checkmark)
+        \end{itemize}
+        
+        Both approaches agree, and the differences $9, 4, 2$ follow a clean halving pattern:
+        \[ -24 \xrightarrow{+9} -15 \xrightarrow{+4} -11 \xrightarrow{+2} \mathbf{-9} \]
+        
+        \textbf{\#\# Answer}\\
+        \[ \mathbf{-9} \]
+    }%
+}
+
+\vspace{0.5cm}
+
+\subsection*{Model B (minimax-m3)}
+\noindent\fbox{%
+    \parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{%
+        I can see this is a long sequence with an obvious pattern of repeating blocks of numbers, but I cannot identify the underlying rule that generates these specific numbers from the sequence alone. What I can observe:
+        \begin{itemize}[leftmargin=*, topsep=0pt, itemsep=0pt]
+            \item The sequence appears to be grouped in blocks of approximately 8 numbers
+            \item Each block contains similar structure (ending with 0, 0, 0, 0 or similar patterns)
+            \item The blocks look like they could represent data points (perhaps prime-related calculations, continued fraction expansions, or modular arithmetic values)
+        \end{itemize}
+        Without additional context about what mathematical operation or function generates these numbers (for example, what inputs produce these outputs, or what the numbers represent), I cannot reliably determine the missing term. Could you provide:
+        \begin{enumerate}[leftmargin=*, topsep=0pt, itemsep=0pt]
+            \item \textbf{The source/origin} of this sequence (what problem it comes from)
+            \item \textbf{What the numbers represent} (e.g., are these coefficients, remainders, values of some function?)
+            \item \textbf{Any additional constraints} (the missing term's position or approximate value range)
+        \end{enumerate}
+        With that context, I could help identify the pattern. Alternatively, if you know the answer and would like me to verify it against the apparent block structure, I'd be happy to help check.
+    }%
+}
+
+\vspace{0.5cm}
+
+\section*{3. Evaluation \& Reasoning}
+
+\textbf{Decision:} Model A \\
+\textbf{Category/Domain:} Mathematical Reasoning / Pattern Recognition
+
+\subsection*{Detailed Justification}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Instruction Following:} The prompt asks to find a missing term in a complex sequence. Model A fully attempted and successfully completed the task. Model B identified a surface-level pattern but ultimately refused to solve the problem, asking for more context instead.
+    \item \textbf{Accuracy \& Analytical Depth:} The sequence is mathematically chaotic, generated by the formula $a_n = \lfloor \tan(n+\tan(n)) \rfloor$. Without knowing this formula, Model A exhibited exceptional heuristic reasoning. It correctly identified the block size (18 numbers separated by four zeros), aligned them into a matrix, isolated the relevant column, and accurately calculated the geometric convergence of the differences ($+9, +4, +2$) to arrive at the correct missing value (\textbf{-9}). 
+    \item \textbf{Helpfulness \& Hallucinations:} Model A arrived at the exact correct answer purely through advanced data extrapolation, completely avoiding hallucinations. Model B, while honest about its limitations, provided zero utility to the user for the specific task requested.
+    \item \textbf{Conclusion:} Model A is the definitive winner. Its ability to perform "blind" pattern recognition and tabular alignment on a non-obvious sequence to accurately extrapolate the missing term demonstrates a vastly superior level of mathematical reasoning compared to Model B.
+\end{itemize}
+
+\end{document}

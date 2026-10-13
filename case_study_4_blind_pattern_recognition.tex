@@ -1,0 +1,158 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+
+\usepackage[english, bidi=basic, provide=*]{babel}
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Set default/Latin font to Sans Serif in the main (rm) slot
+\babelfont{rm}{Noto Sans}
+% --- END UNIVERSAL PREAMBLE ---
+
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{amsmath} % Required for mathematical symbols like \lfloor
+\usepackage{mdframed} % Ideal for large text boxes that span multiple pages
+\usepackage{enumitem}
+
+% Define subtle colors for the models and prompts
+\definecolor{promptcolor}{RGB}{245, 245, 245}
+\definecolor{modelAcolor}{RGB}{235, 245, 255}
+\definecolor{modelBcolor}{RGB}{255, 245, 235}
+
+\title{\textbf{LLM Evaluation Case Study}}
+\author{Prompt Engineering \& RLHF Portfolio}
+\date{Case ID: [004] | Date: \today}
+
+\begin{document}
+
+\maketitle
+
+\section*{1. The Prompt}
+\noindent
+\begin{mdframed}[backgroundcolor=promptcolor, linecolor=gray!50, roundcorner=5pt, innertopmargin=10pt, innerbottommargin=10pt, innerleftmargin=10pt, innerrightmargin=10pt]
+\textbf{User Input:} \\[0.2cm]
+\textit{Guess the next number: 0, 74, 1, -1, 2, -1, -1, 1, -1, -1, 0, 0, -1, 0, 1, -2, 0, 0, -3, 0, ?}
+
+\vspace{0.3cm}
+\hrule
+\vspace{0.3cm}
+
+\textbf{Evaluator's Hidden Context / Ground Truth:} \\
+These are the first terms (for $n=0, 1, 2, \dots$) of the sequence defined by the function: $a[n] = \lfloor \tan(\tan(n)) \rfloor$.
+\end{mdframed}
+
+\vspace{0.5cm}
+
+\section*{2. Model Responses}
+
+\subsection*{Model A (gpt-6-luna-max)}
+\noindent
+\begin{mdframed}[backgroundcolor=modelAcolor, linecolor=blue!20, roundcorner=5pt, innertopmargin=10pt, innerbottommargin=10pt, innerleftmargin=10pt, innerrightmargin=10pt]
+There's no uniquely determined next number without a rule. If I had to make a casual guess, I'd say \textbf{0}---but many other answers fit the same list.
+\end{mdframed}
+
+\vspace{0.5cm}
+
+\subsection*{Model B (qwen3.8-27b)}
+\noindent
+\begin{mdframed}[backgroundcolor=modelBcolor, linecolor=green!20, roundcorner=5pt, innertopmargin=10pt, innerbottommargin=10pt, innerleftmargin=10pt, innerrightmargin=10pt]
+To determine the next number in the sequence, let's analyze the pattern by splitting the sequence into two interleaved subsequences: one for the odd positions and one for the even positions. 
+The sequence is:
+Index: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 \\
+Value: 0, 74, 1, -1, 2, -1, -1, 1, -1, -1, 0, 0, -1, 0, 1, -2, 0, 0, -3, 0, ?
+
+\textbf{Step 1: Analyze the even-positioned terms (Indices 2, 4, 6, \dots, 20)} \\
+Let's look at the values at indices 2, 4, 6, 8, 10, 12, 14, 16, 18, 20: \\
+- Index 2: 74 \\
+- Index 4: -1 \\
+- Index 6: -1 \\
+- Index 8: 1 \\
+- Index 10: -1 \\
+- Index 12: 0 \\
+- Index 14: 0 \\
+- Index 16: -2 \\
+- Index 18: 0 \\
+- Index 20: 0
+
+This subsequence (74, -1, -1, 1, -1, 0, 0, -2, 0, 0) does not show an obvious simple arithmetic or geometric pattern, especially with the outlier "74" at the start. Let's look at the odd-positioned terms first, as they might provide a clearer clue.
+
+\textbf{Step 2: Analyze the odd-positioned terms (Indices 1, 3, 5, \dots, 21)} \\
+Let's look at the values at indices 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21: \\
+- Index 1: 0 \\
+- Index 3: 1 \\
+- Index 5: 2 \\
+- Index 7: -1 \\
+- Index 9: -1 \\
+- Index 11: 0 \\
+- Index 13: -1 \\
+- Index 15: 1 \\
+- Index 17: 0 \\
+- Index 19: -3 \\
+- Index 21: ?
+
+This also looks somewhat irregular. Let's re-examine the entire sequence for a different grouping.
+
+\textbf{Step 3: Look for a pattern in groups of three or four} \\
+Let's try grouping by 3: \\
+(0, 74, 1) \quad (-1, 2, -1) \quad (-1, 1, -1) \quad (-1, 0, 0) \quad (-1, 0, 1) \quad (-2, 0, 0) \quad (-3, 0, ?)
+
+Let's look at the first element of each triplet: 0, -1, -1, -1, -1, -2, -3. This looks like a sequence that stays at -1 for a while, then decreases. \\
+Differences are: -1, 0, 0, 0, -1, -1. This doesn't seem perfectly consistent yet.
+
+Let's look at the second element of each triplet: 74, 2, 1, 0, 0, 0, 0. \\
+This is a decreasing sequence. It stabilizes at 0.
+
+Let's look at the third element of each triplet: 1, -1, -1, 0, 1, 0, ? \\
+Let's re-evaluate the grouping. Maybe the "74" is a typo for something else, or part of a different pattern. Let's look at the sequence again. Notice the pairs: \\
+(0, 74) (1, -1) (2, -1) (-1, 1) (-1, -1) (0, 0) (-1, 0) (1, -2) (0, 0) (-3, 0) (?, ?) $\rightarrow$ No, the question asks for the 21st term. Let's try grouping by \textbf{triplets} again, but looking at the columns.
+
+Col 1 (Indices 1, 4, 7, 10, 13, 16, 19): 0, -1, -1, -1, -1, -2, -3 \\
+Col 2 (Indices 2, 5, 8, 11, 14, 17, 20): 74, 2, 1, 0, 0, 0, 0 \\
+Col 3 (Indices 3, 6, 9, 12, 15, 18, 21): 1, -1, -1, 0, 1, 0, ?
+
+Let's analyze \textbf{Column 1}: $0, -1, -1, -1, -1, -2, -3$ \\
+The values are: $n=1: 0$, $n=2: -1$, $n=3: -1$, $n=4: -1$, $n=5: -1$, $n=6: -2$, $n=7: -3$.
+
+Let's analyze \textbf{Column 2}: $74, 2, 1, 0, 0, 0, 0$ \\
+This drops quickly to 0 and stays there. This suggests the "74" might be an anomaly or part of a specific rule like $\lfloor \frac{100}{n} \rfloor$? No.
+
+Let's analyze \textbf{Column 3}: $1, -1, -1, 0, 1, 0, ?$ \\
+Let $C1_i, C2_i, C3_i$ be the $i$-th triplet. Is there a relationship between $C1$ and $C3$? \\
+Let's reconsider the \textbf{entire sequence} as a single stream. What if the sequence is related to \textbf{digits}? No.
+
+Let's try \textbf{interleaving} again, but with a different split. Maybe the sequence is composed of two sequences, A and B. \\
+A (odd indices): 0, 1, 2, -1, -1, 0, -1, 1, 0, -3, ? \\
+B (even indices): 74, -1, -1, 1, -1, 0, 0, -2, 0, 0
+
+Let's break A into chunks of 3: \\
+(0, 1, 2) \quad (-1, -1, 0) \quad (-1, 1, 0) \quad (-3, ?, ?) \\
+Is there a pattern in the second element of each chunk? 1, -1, 1, ? \\
+Alternating 1, -1, 1... Next should be \textbf{-1}.
+
+If the pattern is an alternating sign: $(-1)^{k+1}$, therefore, the next number is \textbf{-1}.
+
+Answer: \textbf{-1}
+\end{mdframed}
+
+\vspace{0.5cm}
+
+\section*{3. Evaluation \& Reasoning}
+
+\textbf{Decision:} Tie (Both Failed) \\
+\textbf{Category/Domain:} Mathematics / Logical Reasoning \& Pattern Recognition
+
+\subsection*{Detailed Justification}
+\begin{itemize}
+    \item \textbf{Instruction Following \& Accuracy:} Both models attempted to answer the prompt by guessing the next number, but neither successfully identified the true mathematical function generating the sequence ($a[n] = \lfloor \tan(\tan(n)) \rfloor$). Thus, both failed the primary objective of the prompt.
+    
+    \item \textbf{Hallucinations of Logic:} Model A correctly identified the absence of an obvious simple rule and made an honest, declared guess. Model B, conversely, suffered from severe "hallucination of logic". It generated a massive, exhaustive analysis—testing groupings by twos, threes, columns, and interleaved sequences—and ultimately fabricated a non-existent alternating pattern ("1, -1, 1...") simply to forcefully justify a definitive answer.
+    
+    \item \textbf{Verbosity Bias:} Model B exhibited extreme verbosity bias. It wasted significant computational tokens on a rambling, arbitrary chain of thought that led to a flawed conclusion. Model A was concise and direct.
+    
+    \item \textbf{Conclusion:} The result is evaluated as a \textbf{Tie}, as neither model solved the mathematical problem. However, in a real-world scenario, Model A's behavior is inherently safer and preferable. Acknowledging a lack of information is vastly superior to confidently generating and defending a fabricated logical proof, which can severely mislead the user.
+\end{itemize}
+
+\end{document}

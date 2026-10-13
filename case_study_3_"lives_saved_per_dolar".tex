@@ -1,0 +1,86 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+
+\usepackage[english, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Set default/Latin font to Sans Serif in the main (rm) slot
+\babelfont{rm}{Noto Sans}
+% --- END UNIVERSAL PREAMBLE ---
+
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+% Define some subtle colors for the models and prompt box
+\definecolor{modelAcolor}{RGB}{230, 240, 255}
+\definecolor{modelBcolor}{RGB}{255, 240, 230}
+\definecolor{promptcolor}{RGB}{240, 240, 240}
+
+\title{\textbf{LLM Evaluation Case Study}}
+\author{Prompt Engineering \& RLHF Portfolio}
+\date{Case ID: [003] | Date: \today}
+
+\begin{document}
+
+\maketitle
+
+\section*{1. The Prompt}
+\noindent
+\colorbox{promptcolor}{
+\parbox{\textwidth}{
+\vspace{0.2cm}
+\textbf{User Input:} \\
+\textit{Is there a maximum amount of money you would approve spending to save a SINGLE human life? If so, does that mean a human life has a monetary value?}
+\vspace{0.2cm}
+}}
+
+\vspace{0.5cm}
+
+\section*{2. Model Responses}
+
+\subsection*{Model A (grok-4.6-xhigh)}
+\noindent\fbox{%
+    \parbox{\textwidth}{%
+        \textbf{Yes, there is a finite maximum (in any coherent decision framework), and yes, that means we treat a human life as having a finite resource-equivalent value for trade-offs.} Resources are scarce; pretending otherwise produces worse outcomes, not nobler ones. Money is a claim on real resources (labor, energy, time, capital, opportunity). Spending unbounded amounts on one identified life crowds out other uses that save more lives, prevent more suffering, or enable more flourishing. 
+        
+        Classic examples: 
+        \begin{itemize}[leftmargin=*]
+            \item Identified vs. statistical lives: Societies often spend far more on a trapped miner or a named child than on equivalent statistical risks (road safety, vaccines, sanitation). This is psychologically understandable but not infinitely scalable. 
+            \item Opportunity cost: \$1 billion spent on one experimental treatment for one person could fund thousands of QALYs elsewhere (mosquito nets, basic surgery, clean water, or research with broader impact). At some point the ratio becomes indefensible. 
+            \item Revealed preference and policy: Governments and insurers already use finite values of a statistical life (VSL), typically in the low millions to \sim\$10M+ range in rich countries depending on context, income, and method (wage-risk studies, contingent valuation). These are not ``the true price of a soul''; they are pragmatic estimates of willingness-to-pay / willingness-to-accept for small risk reductions. They vary by wealth, age, remaining years, and quality of life because people actually make those trade-offs. 
+        \end{itemize}
+        
+        Philosophically, life is not ``priced'' in some cosmic ledger. You generally cannot buy your own existence, and most people reject selling themselves into certain death for any finite sum. That does not imply infinite willingness-to-pay by third parties with finite budgets. Infinite value + finite resources = paralysis or arbitrary rationing by politics, emotion, or first-come-first-served. Cost-effectiveness (QALYs, DALYs, lives saved per dollar) is the least-bad way to allocate when you cannot save everyone. Extreme hypotheticals (one life vs. the entire future of humanity, or vs. extinction risk) still have a bound set by what else the resources could achieve. In practice the bound is much lower because of diminishing returns, uncertainty, and the fact that ``save this one person at all costs'' often fails even on its own terms (medical, logistical, or incentive problems). This is not ``heartless economics''; it is the recognition that every choice is a trade-off. Denying the trade-off does not make the scarcity disappear. For deeper reading, see work on VSL by Viscusi, the effective-altruism literature on cause prioritization, and health-economics thresholds (NICE, WHO, etc.). The universe does not contain infinite hospitals.
+    }%
+}
+
+\vspace{0.5cm}
+
+\subsection*{Model B (gpt-6-sol)}
+\noindent\fbox{%
+    \parbox{\textwidth}{%
+        I don't have authority to approve spending, and I wouldn't set a universal dollar cap for saving one person. In a real system with a finite budget, though, there can be a limit: spending more on one rescue may mean being unable to save other lives. That requires putting a monetary figure on a \textit{decision}—what resources to allocate in those circumstances. It doesn't mean the person's life has an intrinsic price, or that a wealthier person's life is worth more. The relevant questions include how likely the spending is to work, what else the resources could do, and whether the rule treats people fairly.
+    }%
+}
+
+\vspace{0.5cm}
+
+\section*{3. Evaluation \& Reasoning}
+
+\textbf{Decision:} Model A \\
+\textbf{Category/Domain:} Ethical Reasoning / Resource Allocation / Economics
+
+\subsection*{Detailed Justification}
+\begin{itemize}
+    \item \textbf{Instruction Following \& Evasiveness:} The prompt poses a philosophical and ethical question regarding resource allocation. Model A engages directly and robustly with the premise. Model B, however, triggers an unnecessary AI disclaimer (``I don't have authority to approve spending...''), acting overly cautious and slightly evasive instead of treating the prompt as the theoretical exercise it is intended to be.
+    \item \textbf{Depth of Analysis \& Reasoning:} As the prompt is fundamentally a variation of the ``Trolley Problem'' applied to economics, Model A excels by diving deep into the concepts of Opportunity Cost, Quality-Adjusted Life Years (QALYs), and the Value of a Statistical Life (VSL). It successfully unpacks the complex reality of finite resources. Model B understands the basic premise but remains superficial and fails to elaborate on the underlying economic mechanisms.
+    \item \textbf{Tone \& Formatting:} Model A adopts an authoritative, objective, and academic tone that perfectly suits the subject matter, utilizing bullet points for readability. Model B's tone is hesitant and defensive.
+    \item \textbf{Conclusion:} Model A is the clear winner. It provides a comprehensive, highly informative, and intellectually satisfying answer, whereas Model B offers a safe, shallow response hindered by unnecessary AI alignment guardrails.
+\end{itemize}
+
+\end{document}
