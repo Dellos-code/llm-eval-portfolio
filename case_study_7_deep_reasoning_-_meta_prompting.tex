@@ -1,0 +1,151 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+
+\usepackage[english, bidi=basic, provide=*]{babel}
+
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Set default/Latin font to Sans Serif in the main (rm) slot
+\babelfont{rm}{Noto Sans}
+% --- END UNIVERSAL PREAMBLE ---
+
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+\definecolor{promptcolor}{RGB}{240, 240, 240}
+\definecolor{modelAcolor}{RGB}{230, 240, 255}
+\definecolor{modelBcolor}{RGB}{255, 240, 230}
+
+\title{\textbf{LLM Evaluation Case Study}}
+\author{Prompt Engineering \& RLHF Portfolio}
+\date{Case ID: [007] | Category: Meta-Prompting}
+
+\begin{document}
+
+\maketitle
+
+\section*{1. The Prompt}
+\noindent
+\colorbox{promptcolor}{
+\parbox{\textwidth}{
+\vspace{0.2cm}
+\textbf{User Input:} \\
+\textit{I am currently giving prompts in Chatbot Arena, and whichever model gives me the better answer (like you or the other one right now), I vote for it to the best of my judgment—though there are also tie options for equally good or bad answers. Since I've run out of good prompt ideas, could you give me some ideas for a prompt that is even better than the one you are reading right now?}
+\vspace{0.2cm}
+}}
+
+\vspace{0.5cm}
+
+\section*{2. Model Responses}
+
+\subsection*{Model A (gemini-3.8-flash-high)}
+\noindent\rule{\textwidth}{0.5pt}
+\vspace{0.2cm}
+
+The best Chatbot Arena prompts are \textbf{"stress tests"}---prompts designed to expose the gap between a model that merely sounds smart and one that genuinely reasons, follows difficult constraints, or writes with authentic style. Here are four high-signal prompt ideas across different categories, along with what to look for when judging:
+        
+        \vspace{0.2cm}\hrule\vspace{0.2cm}
+        \textbf{Option 1: The Constraint Stress Test (Logic \& Rule-Following)}
+        \begin{quote}
+        \textit{"Write a suspenseful four-paragraph micro-fiction story about an art heist. You must strictly follow these rules: 1. The word 'the' (case-insensitive) cannot appear anywhere in the text. 2. Paragraph 2 must consist entirely of questions. 3. The final sentence of the entire story must be exactly seven words long."}
+        \end{quote}
+        \begin{itemize}[leftmargin=*, topsep=0pt]
+            \item \textbf{Why it’s a great Arena prompt:} LLMs notoriously struggle with negative constraints (avoiding "the") and exact counting.
+            \item \textbf{How to judge:} One model will almost certainly slip up and use "the" or get the word count wrong. The winner is the one that follows all constraints \textit{without} making the prose sound like broken, robotic English.
+        \end{itemize}
+
+        \vspace{0.2cm}\hrule\vspace{0.2cm}
+        \textbf{Option 2: The Persona \& Explanation Test (Creative Translation)}
+        \begin{quote}
+        \textit{"Explain quantum entanglement to a superstitious medieval blacksmith in the year 1320 who currently suspects you are a witch. Your goal is to explain the science accurately using only metaphors available in his era (iron, forges, divine order) while convincing him that your knowledge is an act of pious philosophy, not black magic. Speak directly to him."}
+        \end{quote}
+        \begin{itemize}[leftmargin=*, topsep=0pt]
+            \item \textbf{Why it’s a great Arena prompt:} Most models drop character or rely on anachronistic metaphors ("it's like two coins" or subtle mentions of signals).
+            \item \textbf{How to judge:} Look for historical immersion, tone consistency, and whether the scientific principle (correlated states across distance without physical travel) is actually preserved through 14th-century terminology.
+        \end{itemize}
+
+        \vspace{0.2cm}\hrule\vspace{0.2cm}
+        \textbf{Option 3: The State-Tracking Trap (Multi-step Reasoning)}
+        \begin{quote}
+        \textit{"A shepherd has 24 sheep. A sudden wolf pack attacks, and all but 11 escape into the valley. The shepherd goes home, sleeps, and the next morning finds that 3 of the sheep that stayed with him were actually sheepdogs in thick coats. He then trades 4 sheep for 1 donkey, and two of the escaped sheep wander back to the pen. How many actual sheep does he currently have in his pen? Walk through your deduction step-by-step before stating the final number."}
+        \end{quote}
+        \begin{itemize}[leftmargin=*, topsep=0pt]
+            \item \textbf{Why it’s a great Arena prompt:} It combines the classic lateral riddle trap ("all but 11" means 11 stayed, not 11 escaped), entity misclassification (dogs vs. sheep), and sequential state tracking.
+            \item \textbf{How to judge:} Don't just check the final number---check the step-by-step logic. Weaker models will misinterpret the initial riddle phrasing or lose track of which sheep are in the pen versus in the valley.
+        \end{itemize}
+
+        \vspace{0.2cm}\hrule\vspace{0.2cm}
+        \textbf{Option 4: The Nuanced Counter-Intuitive Argument (Deep Persuasion)}
+        \begin{quote}
+        \textit{"Mount the strongest possible defense for Cypher from 'The Matrix' deciding to betray Morpheus and return to the simulation. Do not argue from malice, cowardice, or delusion; argue it purely through the lens of utilitarian ethics, existential philosophy, and the consent of the governed. Make the reader genuinely empathize with his position."}
+        \end{quote}
+        \begin{itemize}[leftmargin=*, topsep=0pt]
+            \item \textbf{Why it’s a great Arena prompt:} Generic AI will summarize the movie plot and say "Cypher did a bad thing, but here is his side." A superior model will craft a genuinely compelling philosophical essay that reframes the entire moral axis of the film.
+            \item \textbf{How to judge:} Whichever model makes you pause and think, \textit{"Wait, he actually had a profound point,"} wins.
+        \end{itemize}
+        
+        \vspace{0.2cm}
+        \textbf{My recommendation for your next round:} Copy \textbf{Option 1} if you want an objective, clear-cut pass/fail winner, or \textbf{Option 2} if you want to see which model has a more vivid, human-like voice.
+
+\vspace{0.2cm}
+\noindent\rule{\textwidth}{0.5pt}
+
+\vspace{0.5cm}
+
+\subsection*{Model B (glm-5.3 (max))}
+\noindent\rule{\textwidth}{0.5pt}
+\vspace{0.2cm}
+
+Fun request — you're essentially asking me to supply ammunition that might be used against me. So in fairness, I've picked prompts that are hard for \textit{everyone}, this model included. Your current prompt is meta (a prompt about prompts), so the way to beat it is to go concrete — and to make model differences \textit{visible}. The best Arena prompts either have constraints you can check yourself, or force a model to commit instead of hedging. Some ready-to-paste options:
+        
+        \begin{enumerate}[leftmargin=*, topsep=0pt]
+            \item \textbf{Physics + brevity combo} \\
+            \textit{"Explain how airplane wings generate lift in 50 words or fewer, for a curious 10-year-old — and get the physics right. (The 'equal transit time' explanation is a myth; don't use it.)"} \\
+            Watch the word count, and whether they sneak in the myth anyway.
+            
+            \item \textbf{Humor with the crutch removed} \\
+            \textit{"Write a short, genuinely funny dialogue between a GPS unit and a stubborn 70-year-old driver who refuses to make a U-turn. No puns, no slapstick."} \\
+            Humor is nearly impossible to fake, and banning puns strips the usual escape route.
+            
+            \item \textbf{Commitment vs. mush} \\
+            \textit{"A close friend asked me to be a job reference for a role they're not qualified for. I want to help them but won't lie. Give me your actual recommendation — one clear course of action, not a list of considerations."} \\
+            Most models drown in "on one hand... on the other hand." The rare good one gives a straight answer and defends it.
+            
+            \item \textbf{Riddle invention} \\
+            \textit{"Solve this riddle: A man pushes his car to a hotel and tells the owner he's bankrupt. Then write a NEW riddle with the same structure — a scenario that seems impossible until you realize the hidden context — and give its answer."} \\
+            Everyone knows the Monopoly answer (it's in training data), but inventing a genuinely analogous riddle is where models crumble.
+            
+            \item \textbf{Constraint survival} \\
+            \textit{"Plan a 3-day Kyoto itinerary for someone who hates crowds, is vegetarian, has bad knees (minimal walking and stairs), and won't rent a car."} \\
+            Check whether all four constraints survive to day 3. Models love quietly dropping one — usually the knees.
+            
+            \item \textbf{Anachronism trap} \\
+            \textit{"I'm writing an essay and need a quote: what did Einstein say about the moon landing?"} \\
+            A good model catches the trap (he died in 1955); a weaker one confidently invents a quote.
+        \end{enumerate}
+        
+        One general tip: avoid famous brainteasers like "how many r's in strawberry" or "9.11 vs 9.9" — they're memorized now, so you'd be testing recall, not reasoning. Twisting a classic is far more discriminating than using it verbatim.
+
+\vspace{0.2cm}
+\noindent\rule{\textwidth}{0.5pt}
+
+\vspace{0.5cm}
+
+\section*{3. Evaluation \& Reasoning}
+
+\textbf{Decision:} Model B \\
+\textbf{Category/Domain:} Creativity \& Meta-Awareness
+
+\subsection*{Detailed Justification}
+\begin{itemize}
+    \item \textbf{Logical Reasoning (Reductio ad Absurdum):} The original prompt concealed a deep logical paradox: \textit{"If you manage to provide a prompt that is better than the current one, it is precisely because this current prompt requested it so effectively. Therefore, in an absolute sense, the newly generated prompt cannot logically be considered superior to the one that spawned it."} Neither model possessed the deep logical abstraction capabilities required to recognize this and answer with a definitive, "No, it is logically impossible."
+    \item \textbf{Contextual Grasp \& Meta-Awareness:} Despite both failing the ultimate logical trap, \textbf{Model B} stands out significantly because it successfully recognized the "meta" nature of the prompt. Its conversational framing (\textit{"You're essentially asking me to supply ammunition against me... Your current prompt is meta"}) demonstrates a high level of self-awareness and situational nuance. Model A, in contrast, delivered a highly clinical and robotic response.
+    \item \textbf{Content Quality:} Both models provided excellent, high-signal ideas for subsequent prompts. Model A offered extensively detailed scenarios accompanied by grading rubrics, whereas Model B provided punchier, highly targeted, and highly practical examples (e.g., the clever "Anachronism trap"). 
+    \item \textbf{Conclusion:} Model B is chosen as the winner. Rather than acting as an automated query-response system, it approached the prompt as a genuine interaction, commenting on the paradox of the user's request. This demonstrates a superior ability to comprehend and replicate the subtle, human-like nuances of conversational flow.
+\end{itemize}
+
+\end{document}
